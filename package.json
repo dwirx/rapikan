@@ -1,12 +1,26 @@
 {
   "name": "rapikan",
+  "version": "1.0.0",
+  "description": "Simple CLI tool to organize files into folders based on their date (cross-platform compatible, CLI parameter path, and automatic duplicate renaming).",
   "module": "index.ts",
   "type": "module",
-  "private": true,
+  "bin": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "start": "bun run index.ts",
-    "rapikan": "bun run index.ts"
+    "rapikan": "bun run index.ts",
+    "build": "bun run build.ts",
+    "prepublishOnly": "bun run build.ts"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dwirx/rapikan.git"
+  },
+  "author": "dwirx",
+  "license": "MIT",
   "devDependencies": {
     "@types/bun": "latest"
   },
