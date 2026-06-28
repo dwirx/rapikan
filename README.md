@@ -22,57 +22,121 @@ Tool ini sangat berguna untuk merapikan file media seperti hasil rekaman drone (
 
 ---
 
-## 💻 Cara Penggunaan
+## 📦 Instalasi & Cara Penggunaan
 
-Anda dapat menggunakan tool ini dengan beberapa cara: setelah diinstal secara global dari npm, menggunakan `npx`, atau secara lokal (jika men-clone repositori ini).
-
-### A. Melalui npm (Rekomendasi & Paling Praktis)
-
-Anda tidak perlu men-clone repositori ini untuk menggunakannya. Cukup jalankan lewat npm/Node.js:
-
-#### 1. Jalankan langsung dengan `npx` (Tanpa Instalasi)
+### 🚀 One-line Install (Recommended for Linux/macOS)
+Unduh dan pasang executable `rapikan` secara otomatis ke path sistem Anda:
 ```bash
-npx rapikan .\path\ke\folder\
-```
-*Atau untuk langsung memproses tanpa konfirmasi:*
-```bash
-npx rapikan .\path\ke\folder\ -y
+curl -fsSL https://raw.githubusercontent.com/dwirx/rapikan/main/install-curl.sh | bash
 ```
 
-#### 2. Instalasi Global
-Instal paket secara global di sistem Anda (memerlukan Node.js):
+### 📦 Package Managers
+
+#### **NPM / Yarn / PNPM**
+Pasang secara global ke sistem Anda (memerlukan Node.js):
 ```bash
 npm install -g rapikan
+# Or using Yarn
+yarn global add rapikan
+# Or using PNPM
+pnpm add -g rapikan
 ```
-Setelah diinstal, Anda dapat memanggil perintah `rapikan` langsung dari folder mana pun di terminal Anda:
+
+#### **Bun (Recommended)**
 ```bash
-rapikan .\path\ke\folder\
+bun install -g rapikan
 ```
 
 ---
 
-### B. Menjalankan Secara Lokal (Development/Clone)
+### 🪟 Windows Support
+Tool ini sepenuhnya kompatibel dengan **PowerShell, CMD, Git Bash, dan WSL** (termasuk penanganan path Windows dan normalisasi otomatis).
 
-Jika Anda men-clone repositori ini ke komputer lokal Anda:
-
-#### 1. Install Dependensi (menggunakan Bun)
-```bash
-bun install
+#### **Windows (PowerShell/CMD)**
+```powershell
+npm install -g rapikan
+# Or with Bun
+bun install -g rapikan
 ```
 
-#### 2. Jalankan Perintah
-- **Mode Interaktif**:
-  ```bash
-  bun run rapikan
-  ```
-- **Mode Parameter Path**:
-  ```bash
-  bun run rapikan .\path\ke\folder\
-  ```
-- **Mode Instan (Auto-Confirm)**:
-  ```bash
-  bun run rapikan .\path\ke\folder\ -y
-  ```
+#### **Scoop (Windows)**
+*(Opsional)* Anda dapat memasangnya via Scoop jika bucket terdaftar:
+```powershell
+scoop bucket add dwirx https://github.com/dwirx/scoop-rapikan
+scoop install rapikan
+```
+
+---
+
+### 🍎 macOS & Linux Alternative (Homebrew / AUR)
+
+#### **Homebrew (macOS/Linux)**
+```bash
+brew tap dwirx/rapikan
+brew install rapikan
+```
+
+#### **Arch Linux (AUR)**
+```bash
+yay -S rapikan-bin
+# Or using paru
+paru -S rapikan-bin
+```
+
+---
+
+### 📥 Manual Download
+Unduh file binary mandiri (standalone binary) langsung dari rilis terbaru di GitHub:
+- **Linux x64**: [rapikan-linux-x64](https://github.com/dwirx/rapikan/releases/latest/download/rapikan-linux-x64)
+- **Linux ARM64**: [rapikan-linux-arm64](https://github.com/dwirx/rapikan/releases/latest/download/rapikan-linux-arm64)
+- **Windows x64**: [rapikan-windows-x64.exe](https://github.com/dwirx/rapikan/releases/latest/download/rapikan-windows-x64.exe)
+- **macOS Intel**: [rapikan-darwin-x64](https://github.com/dwirx/rapikan/releases/latest/download/rapikan-darwin-x64)
+- **macOS Apple Silicon**: [rapikan-darwin-arm64](https://github.com/dwirx/rapikan/releases/latest/download/rapikan-darwin-arm64)
+
+**Setelah diunduh (untuk macOS/Linux):**
+```bash
+# Ubah hak akses agar dapat dieksekusi
+chmod +x rapikan-linux-x64
+
+# Pindahkan ke bin path global
+sudo mv rapikan-linux-x64 /usr/local/bin/rapikan
+```
+
+---
+
+### 🐚 Kompatibilitas Shell & Cara Kerja
+- Bekerja baik pada bash, zsh, fish, dan POSIX shell lainnya.
+- **Deteksi runtime otomatis**: Jika dipanggil via CLI paket manager, ia akan mendeteksi runtime terbaik di komputer Anda (`Bun` ➔ `Node.js` ➔ `fallback`).
+- **Eksekusi langsung (NPX)**: Anda juga bisa menjalankannya tanpa instalasi menggunakan `npx rapikan .\path\ke\folder`.
+
+---
+
+### 💻 Parameter Command Line
+
+Setelah terpasang, gunakan perintah berikut untuk merapikan file:
+
+#### 1. Jalankan di folder saat ini (Menu Interaktif)
+```bash
+rapikan
+```
+
+#### 2. Jalankan pada folder tertentu
+```bash
+rapikan .\path\ke\folder\
+```
+
+#### 3. Jalankan instan tanpa konfirmasi (Auto-Confirm)
+```bash
+rapikan .\path\ke\folder\ -y
+```
+
+---
+
+### 🛠️ Pengembangan (Development / Clone)
+Jika Anda men-clone repositori ini untuk mengembangkannya secara lokal:
+1. Pasang dependensi: `bun install`
+2. Lakukan build: `bun run build`
+3. Jalankan typescript: `bun run index.ts`
 
 ---
 
