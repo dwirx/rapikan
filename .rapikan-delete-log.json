@@ -1,0 +1,26 @@
+[
+  {
+    "action": "delete_manual",
+    "path": "F:\\2026\\rkdrone\\DCIM\\compress-video\\rapikan\\test-data\\sampah",
+    "isDir": true,
+    "itemCount": 2,
+    "size": 0,
+    "timestamp": "2026-06-28T23:51:28.305Z"
+  },
+  {
+    "action": "delete_manual",
+    "path": "F:\\2026\\rkdrone\\DCIM\\compress-video\\rapikan\\test-data\\folder-kosong1",
+    "isDir": true,
+    "itemCount": 0,
+    "size": 0,
+    "timestamp": "2026-06-28T23:51:28.305Z"
+  },
+  {
+    "action": "delete_manual",
+    "path": "F:\\2026\\rkdrone\\DCIM\\compress-video\\rapikan\\test-data\\folder-kosong2",
+    "isDir": true,
+    "itemCount": 0,
+    "size": 0,
+    "timestamp": "2026-06-28T23:51:28.305Z"
+  }
+]

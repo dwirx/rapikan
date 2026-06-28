@@ -15,6 +15,9 @@ export interface CLIArgs {
   doDeleteDupes: boolean;         // --delete-dupes
   deleteWhere:   string | null;   // --delete-where <criteria>
   doCopy:        boolean;         // --copy (copy instead of move)
+  // ── New v1.0.7 flags ──
+  doRm:          boolean;         // --rm (delete any file/folder)
+  rmTargets:     string[];        // paths after --rm
 }
 
 export function parseArgs(argv: string[]): CLIArgs {
@@ -28,6 +31,8 @@ export function parseArgs(argv: string[]): CLIArgs {
   let doClean:       boolean          = false;
   let doDeleteDupes: boolean          = false;
   let doCopy:        boolean          = false;
+  let doRm:          boolean          = false;
+  let rmTargets:     string[]         = [];
   let deleteWhere:   string | null    = null;
   let targetPathArg: string           = "";
   let format:        string           = "YYYY-MM-DD";
@@ -44,6 +49,13 @@ export function parseArgs(argv: string[]): CLIArgs {
     else if (arg === "--clean")                      doClean       = true;
     else if (arg === "--delete-dupes")               doDeleteDupes = true;
     else if (arg === "--copy")                       doCopy        = true;
+    else if (arg === "--rm") {
+      // Collect all subsequent non-flag arguments as paths to delete
+      doRm = true;
+      while (i + 1 < args.length && !args[i + 1].startsWith("-")) {
+        rmTargets.push(args[++i]);
+      }
+    }
     else if (arg === "--delete-where") {
       const next = args[i + 1];
       if (next && !next.startsWith("-")) {
@@ -87,5 +99,7 @@ export function parseArgs(argv: string[]): CLIArgs {
     doDeleteDupes,
     deleteWhere,
     doCopy,
+    doRm,
+    rmTargets,
   };
 }

@@ -19,6 +19,7 @@ import {
   cleanEmptyFolders,
   deleteDuplicates,
   deleteWhere,
+  deleteManual,
 } from "./core/deleter.js";
 
 // ─────────────────────────────────────────────
@@ -38,6 +39,7 @@ export async function main(): Promise<void> {
   if (opts.doClean)       badges.push(red("◉ CLEAN"));
   if (opts.doDeleteDupes) badges.push(red("◉ DELETE-DUPES"));
   if (opts.deleteWhere)   badges.push(red(`◉ DELETE-WHERE: ${opts.deleteWhere}`));
+  if (opts.doRm)          badges.push(bold(red(`◉ HAPUS MANUAL: ${opts.rmTargets.length} target`)));
   if (opts.extFilter)     badges.push(green(`◉ EXT: ${[...opts.extFilter].join(",")}`));
   if (opts.format !== "YYYY-MM-DD") badges.push(blue(`◉ FORMAT: ${opts.format}`));
   if (badges.length) console.log("  " + badges.join("  ") + "\n");
@@ -49,6 +51,13 @@ export async function main(): Promise<void> {
   });
   const question = (q: string): Promise<string> =>
     new Promise((resolve) => rl.question(q, resolve));
+
+  // ── --rm: delete explicit paths — no need for target dir selection ──
+  if (opts.doRm) {
+    await deleteManual(opts.rmTargets, opts.dryRun, opts.skipConfirm, rl, path.resolve(process.cwd()));
+    rl.close();
+    return;
+  }
 
   // ── Select target dir ──
   let targetDir = "";
@@ -95,6 +104,7 @@ export async function main(): Promise<void> {
     rl.close();
     return;
   }
+
 
   // ── Default: organize files ──
   console.log(`\n  ${bold("📂 Memindai:")} ${cyan(targetDir)}\n`);
