@@ -24,6 +24,10 @@ rapikan [path] [flags...]
 | `--ext` | | `string` | *(semua)* | Filter ekstensi file, pisah koma |
 | `--dedup` | | — | `false` | Lewati file dengan isi identik (MD5 hash check) |
 | `--undo` | | — | `false` | Kembalikan file ke lokasi asal (butuh riwayat) |
+| `--copy` | | — | `false` | **Baru v1.0.6** — Salin file (tidak menghapus asli) |
+| `--clean` | | — | `false` | **Baru v1.0.6** — Hapus semua subfolder yang kosong |
+| `--delete-dupes` | | — | `false` | **Baru v1.0.6** — Hapus file duplikat, simpan yang tertua |
+| `--delete-where` | | `criteria` | — | **Baru v1.0.6** — Hapus file berdasarkan kriteria (ukuran/umur/ekstensi) |
 
 ---
 
@@ -196,4 +200,136 @@ rapikan ./media -r --dedup --dry-run
 
 # Full: rekursif + filter + format + dedup + auto-confirm
 rapikan ./DCIM -r --ext mp4,mov,jpg,heic -f YYYY/MM --dedup -y
+
+# v1.0.6 delete operations
+rapikan ./media --clean                            # hapus folder kosong
+rapikan ./media --delete-dupes                     # hapus duplikat
+rapikan ./media --delete-where "size<1MB"          # hapus file kecil
+rapikan ./media --delete-where "age>30d"           # hapus file lama
+rapikan ./media --delete-where "ext=.tmp,.log"     # hapus ekstensi tertentu
 ```
+
+---
+
+## Flag Baru v1.0.6
+
+### `--copy`
+
+Menyalin file ke folder tanggal **tanpa menghapus** file asli. Berguna untuk backup terstruktur.
+
+```bash
+rapikan ./DCIM --copy -f YYYY/MM/DD -y
+rapikan ./DCIM --copy -r --ext mp4,jpg -y
+```
+
+> **Catatan:** Mode `--copy` tidak memengaruhi `--undo` (undo hanya membalik move, bukan copy).
+
+---
+
+### `--clean`
+
+Mencari dan menghapus semua **subfolder kosong** di dalam folder target secara rekursif.
+
+```bash
+# Preview dulu (aman)
+rapikan ./media --clean --dry-run
+
+# Hapus tanpa konfirmasi
+rapikan ./media --clean -y
+
+# Hapus dengan konfirmasi (default)
+rapikan ./media --clean
+```
+
+**Contoh output:**
+```
+  🗂  Mencari folder kosong...
+
+  🗑  3 folder kosong ditemukan:
+
+    ✗ 2025/06/15/
+    ✗ 2025/07/
+    ✗ 2026-01-01/
+
+  Hapus 3 folder kosong? (y/n): y
+
+  ✓ 2025/06/15/
+  ✓ 2025/07/
+  ✓ 2026-01-01/
+
+  ✔ CLEAN SELESAI
+  ✓ Folder dihapus : 3
+  Log: .rapikan-delete-log.json
+```
+
+> Semua operasi hapus tercatat di `.rapikan-delete-log.json` sebagai audit trail.
+
+---
+
+### `--delete-dupes`
+
+Menghapus **file duplikat** berdasarkan hash MD5. Untuk setiap grup duplikat, file dengan **tanggal pembuatan tertua** dipertahankan; sisanya dihapus.
+
+```bash
+# Preview duplikat (aman)
+rapikan ./media --delete-dupes --dry-run
+
+# Hapus duplikat rekursif
+rapikan ./media --delete-dupes -r
+
+# Hapus tanpa konfirmasi
+rapikan ./media --delete-dupes -y
+```
+
+**Contoh output:**
+```
+  🧬 Memindai duplikat (MD5 hash)...
+
+  🔍 1 grup duplikat ditemukan:
+
+  ▸ Hash: a1b2c3d4e5f6...
+    ✓ SIMPAN  DJI_0001.mp4       (125.40 MB)
+    ✗ HAPUS   DJI_0001_copy.mp4  (125.40 MB)
+
+  💾 Total potensi ruang terbebas: 125.40 MB
+
+  Hapus 1 file duplikat? (y/n): y
+
+  ✔ DELETE DUPES SELESAI
+  ✓ File dihapus       : 1
+  ✓ Ruang terbebas     : 125.40 MB
+```
+
+---
+
+### `--delete-where <criteria>`
+
+Menghapus file berdasarkan **kriteria** yang ditentukan. Mendukung 3 jenis kriteria:
+
+| Kriteria | Contoh | Keterangan |
+|----------|--------|------------|
+| `size<N` | `size<1MB` | File lebih kecil dari N (KB/MB/GB) |
+| `size>N` | `size>10MB` | File lebih besar dari N |
+| `age>Nd` | `age>30d` | File lebih lama dari N hari |
+| `age>Nm` | `age>6m` | File lebih lama dari N bulan |
+| `age>Ny` | `age>1y` | File lebih lama dari N tahun |
+| `ext=...` | `ext=.tmp,.log` | File dengan ekstensi tertentu |
+
+```bash
+# Hapus file kecil (< 1MB) — simulasi dulu
+rapikan ./media --delete-where "size<1MB" --dry-run
+
+# Hapus file lebih besar dari 100MB
+rapikan ./media --delete-where "size>100MB" -y
+
+# Hapus file lebih tua dari 1 tahun
+rapikan ./media --delete-where "age>1y"
+
+# Hapus file temp/log
+rapikan ./media --delete-where "ext=.tmp,.log,.DS_Store" -y
+
+# Rekursif + auto-confirm
+rapikan ./archive -r --delete-where "age>30d" -y
+```
+
+> **Penting:** Selalu gunakan `--dry-run` dulu sebelum eksekusi nyata pada folder penting!
