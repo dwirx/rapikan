@@ -24,32 +24,55 @@ Tool ini sangat berguna untuk merapikan file media seperti hasil rekaman drone (
 
 ## 💻 Cara Penggunaan
 
-Pastikan Anda telah menginstal [Bun](https://bun.sh/).
+Anda dapat menggunakan tool ini dengan beberapa cara: setelah diinstal secara global dari npm, menggunakan `npx`, atau secara lokal (jika men-clone repositori ini).
 
-### 1. Install Dependensi
+### A. Melalui npm (Rekomendasi & Paling Praktis)
+
+Anda tidak perlu men-clone repositori ini untuk menggunakannya. Cukup jalankan lewat npm/Node.js:
+
+#### 1. Jalankan langsung dengan `npx` (Tanpa Instalasi)
+```bash
+npx rapikan .\path\ke\folder\
+```
+*Atau untuk langsung memproses tanpa konfirmasi:*
+```bash
+npx rapikan .\path\ke\folder\ -y
+```
+
+#### 2. Instalasi Global
+Instal paket secara global di sistem Anda (memerlukan Node.js):
+```bash
+npm install -g rapikan
+```
+Setelah diinstal, Anda dapat memanggil perintah `rapikan` langsung dari folder mana pun di terminal Anda:
+```bash
+rapikan .\path\ke\folder\
+```
+
+---
+
+### B. Menjalankan Secara Lokal (Development/Clone)
+
+Jika Anda men-clone repositori ini ke komputer lokal Anda:
+
+#### 1. Install Dependensi (menggunakan Bun)
 ```bash
 bun install
 ```
 
-### 2. Jalankan Tool
-
-#### **A. Mode Interaktif**
-Jalankan perintah di bawah ini, lalu pilih folder melalui menu di terminal:
-```bash
-bun run rapikan
-```
-
-#### **B. Mode Parameter Path**
-Tentukan folder target langsung saat menjalankan perintah (mendukung path Windows & Linux):
-```bash
-bun run rapikan .\path\ke\folder\
-```
-
-#### **C. Mode Instan (Auto-Confirm)**
-Tambahkan flag `-y` atau `--yes` untuk langsung memindahkan file tanpa konfirmasi (`y/n`) terlebih dahulu:
-```bash
-bun run rapikan .\path\ke\folder\ -y
-```
+#### 2. Jalankan Perintah
+- **Mode Interaktif**:
+  ```bash
+  bun run rapikan
+  ```
+- **Mode Parameter Path**:
+  ```bash
+  bun run rapikan .\path\ke\folder\
+  ```
+- **Mode Instan (Auto-Confirm)**:
+  ```bash
+  bun run rapikan .\path\ke\folder\ -y
+  ```
 
 ---
 
