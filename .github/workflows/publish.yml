@@ -5,7 +5,45 @@ on:
     types: [published]
 
 jobs:
-  publish:
+  release-binaries:
+    name: Build & Release Binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Compile Standalone Binaries
+        run: |
+          mkdir -p build-binaries
+          # Compile for different platforms
+          bun build --compile --target=bun-linux-x64 ./index.ts --outfile build-binaries/rapikan-linux-x64
+          bun build --compile --target=bun-linux-arm64 ./index.ts --outfile build-binaries/rapikan-linux-arm64
+          bun build --compile --target=bun-windows-x64 ./index.ts --outfile build-binaries/rapikan-windows-x64.exe
+          bun build --compile --target=bun-darwin-x64 ./index.ts --outfile build-binaries/rapikan-darwin-x64
+          bun build --compile --target=bun-darwin-arm64 ./index.ts --outfile build-binaries/rapikan-darwin-arm64
+
+      - name: Upload Binaries to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build-binaries/rapikan-linux-x64
+            build-binaries/rapikan-linux-arm64
+            build-binaries/rapikan-windows-x64.exe
+            build-binaries/rapikan-darwin-x64
+            build-binaries/rapikan-darwin-arm64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    name: Publish to npm
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -28,29 +66,7 @@ jobs:
       - name: Build project (npm dist)
         run: bun run build.ts
 
-      - name: Compile Standalone Binaries
-        run: |
-          mkdir -p build-binaries
-          # Compile for different platforms
-          bun build --compile --target=bun-linux-x64 ./index.ts --outfile build-binaries/rapikan-linux-x64
-          bun build --compile --target=bun-linux-arm64 ./index.ts --outfile build-binaries/rapikan-linux-arm64
-          bun build --compile --target=bun-windows-x64 ./index.ts --outfile build-binaries/rapikan-windows-x64.exe
-          bun build --compile --target=bun-darwin-x64 ./index.ts --outfile build-binaries/rapikan-darwin-x64
-          bun build --compile --target=bun-darwin-arm64 ./index.ts --outfile build-binaries/rapikan-darwin-arm64
-
       - name: Publish to npm
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Upload Binaries to GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            build-binaries/rapikan-linux-x64
-            build-binaries/rapikan-linux-arm64
-            build-binaries/rapikan-windows-x64.exe
-            build-binaries/rapikan-darwin-x64
-            build-binaries/rapikan-darwin-arm64
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
