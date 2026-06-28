@@ -28,6 +28,8 @@ rapikan [path] [flags...]
 | `--clean` | | — | `false` | **Baru v1.0.6** — Hapus semua subfolder yang kosong |
 | `--delete-dupes` | | — | `false` | **Baru v1.0.6** — Hapus file duplikat, simpan yang tertua |
 | `--delete-where` | | `criteria` | — | **Baru v1.0.6** — Hapus file berdasarkan kriteria (ukuran/umur/ekstensi) |
+| `--rm` | | `paths...` | — | **Baru v1.0.7** — Hapus file atau folder apapun secara manual |
+
 
 ---
 
@@ -333,3 +335,49 @@ rapikan ./archive -r --delete-where "age>30d" -y
 ```
 
 > **Penting:** Selalu gunakan `--dry-run` dulu sebelum eksekusi nyata pada folder penting!
+
+---
+
+### `--rm <paths...>`
+
+Menghapus file atau folder secara manual dan permanen dengan satu perintah. 
+Mendukung penghapusan satu file, banyak file sekaligus, atau seluruh direktori beserta isinya.
+
+Perintah ini tidak memerlukan target folder organisasi dan akan langsung memproses target yang didefinisikan.
+
+```bash
+# Hapus satu file
+rapikan --rm ./video-lama.mp4
+
+# Hapus banyak file sekaligus
+rapikan --rm ./file1.mp4 ./file2.jpg ./dokumen.pdf
+
+# Hapus seluruh folder beserta semua isinya
+rapikan --rm ./folder-lama ./backup-temp
+
+# Preview dulu (aman)
+rapikan --rm ./folder-besar --dry-run
+
+# Hapus tanpa konfirmasi (auto-confirm)
+rapikan --rm ./sampah -y
+```
+
+**Tampilan Preview & Ringkasan:**
+```
+  🗑  Mode Hapus Manual — 2 target:
+
+  ✗ sampah  [FOLDER] 15 item di dalamnya
+    F:\media\sampah
+  ✗ video-lama.mp4  [FILE] 1.25 GB
+    F:\media\video-lama.mp4
+
+  📊 Ringkasan:
+  ✗ Target valid      : 2
+  ✗ Total ukuran file : 1.25 GB
+  ⚠ Folder dan SEMUA isinya akan dihapus permanen!
+
+  ⚠ Yakin hapus 2 target? TIDAK BISA DIBATALKAN! (y/n):
+```
+
+> **Audit Trail:** Riwayat penghapusan dicatat secara rinci di dalam berkas `.rapikan-delete-log.json` pada direktori kerja saat ini.
+
