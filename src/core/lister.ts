@@ -4,7 +4,9 @@ import path from "node:path";
 import {
   bold, green, yellow, red, cyan, magenta, blue, gray, dim
 } from "../utils/colors.js";
-import { IGNORED_FILES } from "../utils/fs.js";
+
+// Directories we should list but NOT recurse into to prevent hanging (since node_modules/git contain too many files)
+const NO_RECURSE_DIRS = new Set(["node_modules", ".git", ".gemini", ".agents", "node_modules.zip"]);
 
 // ─────────────────────────────────────────────
 // Format Bytes
@@ -30,6 +32,18 @@ function getFileIcon(filename: string): string {
   return "📄";
 }
 
+// ─────────────────────────────────────────────
+// Format Date to YYYY-MM-DD HH:MM
+// ─────────────────────────────────────────────
+function formatDate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${y}-${m}-${dd} ${hh}:${mm}`;
+}
+
 interface FileInfo {
   name: string;
   fullPath: string;
@@ -41,12 +55,23 @@ interface FileInfo {
 interface DirInfo {
   name: string;
   fullPath: string;
+  date: string;
   files: FileInfo[];
   subdirs: DirInfo[];
 }
 
+interface TableRow {
+  mode: string;
+  lastWriteTime: string;
+  length: string;
+  namePrefix: string;
+  nameIcon: string;
+  nameText: string;
+  isDir: boolean;
+}
+
 // ─────────────────────────────────────────────
-// Recursive tree scan & build
+// Build Directory Tree structure
 // ─────────────────────────────────────────────
 async function buildTree(
   dir: string,
@@ -61,14 +86,27 @@ async function buildTree(
     const files: FileInfo[] = [];
     const subdirs: DirInfo[] = [];
 
-    for (const entry of entries) {
-      if (IGNORED_FILES.has(entry.name)) continue;
+    // Get dir modification time
+    let dirDateStr = "-";
+    try {
+      const s = await stat(dir);
+      dirDateStr = formatDate(s.mtime || s.birthtime);
+    } catch {}
 
+    for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
 
       if (entry.isDirectory()) {
         stats.totalDirs++;
-        if (recursive) {
+        
+        let subDateStr = "-";
+        try {
+          const s = await stat(fullPath);
+          subDateStr = formatDate(s.mtime || s.birthtime);
+        } catch {}
+
+        // List dir, but only recurse if specified and not a blacklisted high-file directory
+        if (recursive && !NO_RECURSE_DIRS.has(entry.name)) {
           const subTree = await buildTree(fullPath, recursive, extFilter, stats);
           if (subTree) {
             subdirs.push(subTree);
@@ -77,6 +115,7 @@ async function buildTree(
           subdirs.push({
             name: entry.name,
             fullPath,
+            date: subDateStr,
             files: [],
             subdirs: []
           });
@@ -90,13 +129,7 @@ async function buildTree(
         try {
           const s = await stat(fullPath);
           size = s.size;
-          const d = s.mtime || s.birthtime;
-          if (d) {
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, "0");
-            const dd = String(d.getDate()).padStart(2, "0");
-            dateStr = `${y}-${m}-${dd}`;
-          }
+          dateStr = formatDate(s.mtime || s.birthtime);
         } catch {}
 
         files.push({
@@ -125,6 +158,7 @@ async function buildTree(
     return {
       name: path.basename(dir) || dir,
       fullPath: dir,
+      date: dirDateStr,
       files,
       subdirs
     };
@@ -134,35 +168,54 @@ async function buildTree(
 }
 
 // ─────────────────────────────────────────────
-// Print Tree representation to console
+// Collect Tree structure into Table Rows
 // ─────────────────────────────────────────────
-function printTree(dirInfo: DirInfo, prefix = "") {
+function collectRows(
+  dirInfo: DirInfo,
+  rows: TableRow[],
+  recursive: boolean,
+  prefix = ""
+) {
   const numDirs = dirInfo.subdirs.length;
   const numFiles = dirInfo.files.length;
-  const totalItems = numDirs + numFiles;
 
-  // Print subdirectories first
+  // Process subdirectories
   for (let i = 0; i < numDirs; i++) {
     const subdir = dirInfo.subdirs[i];
     const isLast = (i === numDirs - 1 && numFiles === 0);
-    const branch = isLast ? "└── " : "├── ";
-    console.log(`${gray(prefix)}${cyan(branch)}📁 ${bold(cyan(subdir.name))}/`);
-    
-    const nextPrefix = prefix + (isLast ? "    " : "│   ");
-    printTree(subdir, nextPrefix);
+    const branch = recursive ? (isLast ? "└── " : "├── ") : "";
+
+    rows.push({
+      mode: "d----",
+      lastWriteTime: subdir.date,
+      length: "<DIR>",
+      namePrefix: prefix + branch,
+      nameIcon: "📁",
+      nameText: subdir.name + (recursive ? "/" : ""),
+      isDir: true
+    });
+
+    if (recursive) {
+      const nextPrefix = prefix + (isLast ? "    " : "│   ");
+      collectRows(subdir, rows, recursive, nextPrefix);
+    }
   }
 
-  // Print files
+  // Process files
   for (let i = 0; i < numFiles; i++) {
     const file = dirInfo.files[i];
     const isLast = (i === numFiles - 1);
-    const branch = isLast ? "└── " : "├── ";
-    
-    const icon = getFileIcon(file.name);
-    const sizeStr = yellow(fmtBytes(file.size));
-    const dateStr = gray(file.date);
-    
-    console.log(`${gray(prefix)}${green(branch)}${icon} ${green(file.name)} ${dim(`(${sizeStr} | ${dateStr})`)}`);
+    const branch = recursive ? (isLast ? "└── " : "├── ") : "";
+
+    rows.push({
+      mode: "-a---",
+      lastWriteTime: file.date,
+      length: fmtBytes(file.size),
+      namePrefix: prefix + branch,
+      nameIcon: getFileIcon(file.name),
+      nameText: file.name,
+      isDir: false
+    });
   }
 }
 
@@ -194,9 +247,37 @@ export async function listDirectory(
     return;
   }
 
-  // Display folder header
-  console.log(bold(cyan(`📁 ${tree.name}/`)));
-  printTree(tree, "");
+  // Collect all rows to output as table
+  const rows: TableRow[] = [];
+  collectRows(tree, rows, recursive, "");
+
+  // Print Header Table (Mode, LastWriteTime, Length, Name)
+  const headerMode = "Mode".padEnd(8);
+  const headerTime = "LastWriteTime".padEnd(18);
+  const headerLen  = "Length".padEnd(12);
+  const headerName = "Name";
+
+  console.log(bold(cyan(`${headerMode}${headerTime}${headerLen}${headerName}`)));
+  console.log(bold(cyan(`${"-".repeat(6).padEnd(8)}${"-".repeat(15).padEnd(18)}${"-".repeat(8).padEnd(12)}${"-".repeat(4)}`)));
+
+  // Print Rows
+  for (const row of rows) {
+    const modeStr = row.isDir ? gray(row.mode.padEnd(8)) : green(row.mode.padEnd(8));
+    const timeStr = gray(row.lastWriteTime.padEnd(18));
+    
+    let lenStr = "";
+    if (row.isDir) {
+      lenStr = cyan(row.length.padEnd(12));
+    } else {
+      lenStr = yellow(row.length.padEnd(12));
+    }
+
+    const prefixStr = gray(row.namePrefix);
+    const iconStr   = row.nameIcon + " ";
+    const nameStr   = row.isDir ? bold(cyan(row.nameText)) : green(row.nameText);
+
+    console.log(`${modeStr}${timeStr}${lenStr}${prefixStr}${iconStr}${nameStr}`);
+  }
 
   // Display Statistics Footer
   console.log("");

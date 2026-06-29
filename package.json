@@ -1,6 +1,6 @@
 {
   "name": "rapikan",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Simple CLI tool to organize files into folders based on their date (cross-platform compatible, CLI parameter path, and automatic duplicate renaming).",
   "module": "index.ts",
   "type": "module",
