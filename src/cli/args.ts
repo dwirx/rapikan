@@ -18,6 +18,8 @@ export interface CLIArgs {
   // ── New v1.0.7 flags ──
   doRm:          boolean;         // --rm (delete any file/folder)
   rmTargets:     string[];        // paths after --rm
+  // ── New v1.0.8 flags ──
+  doLs:          boolean;         // --ls (list files elegantly)
 }
 
 export function parseArgs(argv: string[]): CLIArgs {
@@ -32,6 +34,7 @@ export function parseArgs(argv: string[]): CLIArgs {
   let doDeleteDupes: boolean          = false;
   let doCopy:        boolean          = false;
   let doRm:          boolean          = false;
+  let doLs:          boolean          = false;
   let rmTargets:     string[]         = [];
   let deleteWhere:   string | null    = null;
   let targetPathArg: string           = "";
@@ -49,6 +52,7 @@ export function parseArgs(argv: string[]): CLIArgs {
     else if (arg === "--clean")                      doClean       = true;
     else if (arg === "--delete-dupes")               doDeleteDupes = true;
     else if (arg === "--copy")                       doCopy        = true;
+    else if (arg === "--ls")                         doLs          = true;
     else if (arg === "--rm") {
       // Collect all subsequent non-flag arguments as paths to delete
       doRm = true;
@@ -101,5 +105,6 @@ export function parseArgs(argv: string[]): CLIArgs {
     doCopy,
     doRm,
     rmTargets,
+    doLs,
   };
 }

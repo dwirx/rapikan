@@ -22,5 +22,13 @@
     "itemCount": 0,
     "size": 0,
     "timestamp": "2026-06-28T23:51:28.305Z"
+  },
+  {
+    "action": "delete_manual",
+    "path": "F:\\2026\\rkdrone\\DCIM\\compress-video\\rapikan\\data",
+    "isDir": true,
+    "itemCount": 61,
+    "size": 0,
+    "timestamp": "2026-06-28T23:57:50.860Z"
   }
 ]

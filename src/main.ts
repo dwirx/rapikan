@@ -21,6 +21,7 @@ import {
   deleteWhere,
   deleteManual,
 } from "./core/deleter.js";
+import { listDirectory } from "./core/lister.js";
 
 // ─────────────────────────────────────────────
 // Main orchestration
@@ -40,6 +41,7 @@ export async function main(): Promise<void> {
   if (opts.doDeleteDupes) badges.push(red("◉ DELETE-DUPES"));
   if (opts.deleteWhere)   badges.push(red(`◉ DELETE-WHERE: ${opts.deleteWhere}`));
   if (opts.doRm)          badges.push(bold(red(`◉ HAPUS MANUAL: ${opts.rmTargets.length} target`)));
+  if (opts.doLs)          badges.push(bold(cyan("◉ LIST-FILES")));
   if (opts.extFilter)     badges.push(green(`◉ EXT: ${[...opts.extFilter].join(",")}`));
   if (opts.format !== "YYYY-MM-DD") badges.push(blue(`◉ FORMAT: ${opts.format}`));
   if (badges.length) console.log("  " + badges.join("  ") + "\n");
@@ -101,6 +103,12 @@ export async function main(): Promise<void> {
 
   if (opts.deleteWhere) {
     await deleteWhere(targetDir, opts.deleteWhere, opts.recursive, opts.dryRun, opts.skipConfirm, rl);
+    rl.close();
+    return;
+  }
+
+  if (opts.doLs) {
+    await listDirectory(targetDir, opts.recursive, opts.extFilter);
     rl.close();
     return;
   }

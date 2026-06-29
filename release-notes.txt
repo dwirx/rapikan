@@ -1,0 +1,26 @@
+## ✨ v1.0.8 — Visualisasi Folder & Statistik Detail (`--ls`)
+
+Rilis ini menghadirkan fitur visualisasi struktur file dan folder yang jauh lebih informatif, interaktif, dan terperinci.
+
+### 📁 Fitur Baru: `--ls` (List Files)
+
+Perintah baru untuk memetakan isi folder layaknya perintah `tree` namun dengan estetika tinggi (berwarna) dan kaya akan data statistik penting:
+
+- **Pohon Visual Interaktif**: Cabang pohon `├──` dan `└──` yang rapi dengan pewarnaan ANSI dinamis.
+- **Deteksi Icon Cerdas**: Menampilkan icon visual di samping nama berkas berdasarkan jenisnya (contoh: `🎬` untuk video, `🖼️` untuk foto, `📝` untuk dokumen, `💻` untuk script, dll).
+- **Rincian Detil**: Menampilkan ukuran berkas yang terkonversi secara otomatis (`B`, `KB`, `MB`, `GB`) serta tanggal perubahan terakhir.
+- **Integrasi Penuh**: Dapat dikombinasikan dengan mode rekursif (`-r`) serta filter ekstensi (`--ext`).
+- **Ringkasan Statistik**: Total jumlah berkas, total folder, serta total ukuran direktori.
+- **Distribusi Tipe Berkas**: Menampilkan rekap distribusi format berkas beserta jumlah dan kapasitas penyimpanannya, terurut dari yang terbesar.
+
+### Perintah Penggunaan:
+```bash
+# Daftar berkas di folder saat ini (non-rekursif)
+rapikan --ls
+
+# Daftar berkas mendalam secara rekursif
+rapikan ./media --ls -r
+
+# Daftar berkas video dengan ekstensi tertentu saja
+rapikan ./DCIM --ls -r --ext mp4,mov
+```

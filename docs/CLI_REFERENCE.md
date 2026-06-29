@@ -29,6 +29,8 @@ rapikan [path] [flags...]
 | `--delete-dupes` | | — | `false` | **Baru v1.0.6** — Hapus file duplikat, simpan yang tertua |
 | `--delete-where` | | `criteria` | — | **Baru v1.0.6** — Hapus file berdasarkan kriteria (ukuran/umur/ekstensi) |
 | `--rm` | | `paths...` | — | **Baru v1.0.7** — Hapus file atau folder apapun secara manual |
+| `--ls` | | — | `false` | **Baru v1.0.8** — Tampilkan visualisasi pohon file & folder beserta statistiknya |
+
 
 
 ---
@@ -380,4 +382,46 @@ rapikan --rm ./sampah -y
 ```
 
 > **Audit Trail:** Riwayat penghapusan dicatat secara rinci di dalam berkas `.rapikan-delete-log.json` pada direktori kerja saat ini.
+
+---
+
+### `--ls`
+
+Menampilkan visualisasi pohon file & folder (seperti perintah `tree`), lengkap dengan ukuran berkas, waktu modifikasi terakhir, icon representatif, statistik total, serta grafik distribusi tipe berkas.
+
+Mendukung kombinasi dengan flag `--recursive` / `-r` dan `--ext` untuk membatasi tampilan.
+
+```bash
+# List file/folder di folder saat ini (non-recursive)
+rapikan --ls
+
+# List file/folder secara mendalam di folder target
+rapikan ./media --ls -r
+
+# List hanya berkas video dengan ekstensi tertentu
+rapikan ./DCIM --ls -r --ext mp4,mov
+```
+
+**Contoh Output:**
+```
+📁 media/
+├── 📁 foto/
+│   ├── 🖼️ liburan.jpg (4.25 MB | 2026-06-22)
+│   └── 🖼️ sunset.png (1.80 MB | 2026-06-23)
+├── 📁 video/
+│   └── 🎬 DJI_0001.mp4 (1.20 GB | 2026-06-20)
+└── 📝 catatan.txt (420 B | 2026-06-25)
+
+  📊 STATISTIK DIREKTORI:
+  • Total File       : 4 file
+  • Total Folder     : 2 folder
+  • Total Ukuran     : 1.21 GB
+
+  🧬 DISTRIBUSI TIPE BERKAS (berdasarkan ukuran):
+    🎬 .mp4      :   1 file │     1.20 GB
+    🖼️ .jpg      :   1 file │     4.25 MB
+    🖼️ .png      :   1 file │     1.80 MB
+    📝 .txt      :   1 file │      420 B
+```
+
 

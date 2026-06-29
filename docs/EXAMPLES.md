@@ -267,3 +267,21 @@ rapikan ./media --clean -y
 rapikan ./media --delete-where "size<500KB" --dry-run
 rapikan ./media --delete-where "size<500KB" -y
 ```
+
+---
+
+## Skenario 12: Visualisasi Struktur & Statistik Berkas (--ls) *(v1.0.8)*
+
+Menampilkan gambaran detail dari apa saja berkas yang ada di dalam media penyimpanan Anda, lengkap dengan struktur folder, ukuran, tanggal, serta ringkasan pembagian jenis berkas.
+
+```bash
+# Tampilkan struktur folder saat ini secara interaktif
+rapikan --ls
+
+# Tampilkan secara mendalam (rekursif) beserta semua subfoldernya
+rapikan ./media --ls -r
+
+# Tampilkan hanya berkas video dengan format mp4/mov secara rekursif
+rapikan ./media --ls -r --ext mp4,mov
+```
+
