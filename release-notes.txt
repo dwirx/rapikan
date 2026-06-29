@@ -1,7 +1,22 @@
-## ✨ v1.1.1 — Penyempurnaan Total Ukuran Folder dan Statistik `--ls`
+## ✨ v1.1.2 — Optimasi Performa Instan `--ls` & Flag Opsional `--folder`
 
-Rilis perbaikan dan peningkatan kualitas visual untuk fitur list berkas (`--ls`).
+Pembaruan performa agar listing berkas berjalan sangat cepat tanpa lag secara default.
 
-### 🔧 Perbaikan & Peningkatan:
-- **Kalkulasi Ukuran Folder Akurat**: Memperbaiki kalkulasi ukuran direktori pada listing flat (non-rekursif) sehingga ukuran sub-direktori sekarang dihitung sepenuhnya secara presisi dan dinamis di kolom `Length`.
-- **Akurasi Total Ukuran di Statistik Footer**: Mengubah penghitungan `Total Ukuran` pada statistik direktori di bagian paling bawah agar menampilkan ukuran total folder secara rekursif (`tree.size`), bukan hanya total dari berkas yang terdaftar langsung di root, memberikan representasi data yang akurat.
+### ⚡ Peningkatan Performa:
+- **Default Instan Tanpa Lag**: Saat Anda menjalankan `rapikan --ls`, program tidak lagi menghitung ukuran folder secara rekursif. Ini membuat program berjalan **seketika / instan** tanpa lag (kolom `Length` otomatis menampilkan `<DIR>` untuk folder).
+- **Flag Opsional `--folder` (atau `-folder` / `--ls-folder`)**: Jika Anda ingin menghitung ukuran folder secara terperinci (rekursif), Anda dapat menambahkan flag `--folder` di bagian akhir perintah.
+
+### 💻 Contoh Penggunaan Baru:
+```bash
+# Listing super cepat & instan (default)
+rapikan --ls
+
+# Listing dengan kalkulasi detail ukuran folder (opsional)
+rapikan --ls --folder
+
+# Rekursif instan
+rapikan ./media --ls -r
+
+# Rekursif dengan ukuran folder
+rapikan ./media --ls -r --folder
+```

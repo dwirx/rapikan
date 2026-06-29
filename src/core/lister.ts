@@ -100,7 +100,8 @@ async function buildTree(
   dir: string,
   recursive: boolean,
   extFilter: Set<string> | null,
-  stats: { totalFiles: number; totalDirs: number; totalSize: number; exts: Record<string, { count: number; size: number }> }
+  stats: { totalFiles: number; totalDirs: number; totalSize: number; exts: Record<string, { count: number; size: number }> },
+  showFolderSizes: boolean
 ): Promise<DirInfo | null> {
   if (!existsSync(dir)) return null;
 
@@ -132,19 +133,21 @@ async function buildTree(
         let subdirSize = 0;
         // List dir, but only recurse if specified and not a blacklisted directory
         if (recursive && !NO_RECURSE_DIRS.has(entry.name)) {
-          const subTree = await buildTree(fullPath, recursive, extFilter, stats);
+          const subTree = await buildTree(fullPath, recursive, extFilter, stats, showFolderSizes);
           if (subTree) {
             subdirs.push(subTree);
             subdirSize = subTree.size;
           }
         } else {
-          // If we don't recurse, calculate directory size recursively on the fly
-          subdirSize = await getDirSize(fullPath);
+          // If showFolderSizes is true, calculate directory size recursively on the fly. Otherwise skip.
+          if (showFolderSizes) {
+            subdirSize = await getDirSize(fullPath);
+          }
           subdirs.push({
             name: entry.name,
             fullPath,
             date: subDateStr,
-            size: subdirSize,
+            size: showFolderSizes ? subdirSize : -1,
             files: [],
             subdirs: []
           });
@@ -191,7 +194,7 @@ async function buildTree(
       name: path.basename(dir) || dir,
       fullPath: dir,
       date: dirDateStr,
-      size: dirSize,
+      size: showFolderSizes ? dirSize : stats.totalSize,
       files,
       subdirs
     };
@@ -221,7 +224,7 @@ function collectRows(
     rows.push({
       mode: "d----",
       lastWriteTime: subdir.date,
-      length: fmtBytes(subdir.size),
+      length: subdir.size === -1 ? "<DIR>" : fmtBytes(subdir.size),
       namePrefix: prefix + branch,
       nameIcon: "📁",
       nameText: subdir.name + (recursive ? "/" : ""),
@@ -258,7 +261,8 @@ function collectRows(
 export async function listDirectory(
   targetDir: string,
   recursive: boolean,
-  extFilter: Set<string> | null
+  extFilter: Set<string> | null,
+  showFolderSizes: boolean
 ): Promise<void> {
   const stats = {
     totalFiles: 0,
@@ -273,7 +277,7 @@ export async function listDirectory(
   }
   console.log("");
 
-  const tree = await buildTree(targetDir, recursive, extFilter, stats);
+  const tree = await buildTree(targetDir, recursive, extFilter, stats, showFolderSizes);
 
   if (!tree || (tree.files.length === 0 && tree.subdirs.length === 0)) {
     console.log(yellow("  ⚠ Direktori kosong atau tidak ditemukan berkas yang cocok.\n"));

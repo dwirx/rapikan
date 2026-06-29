@@ -108,7 +108,7 @@ export async function main(): Promise<void> {
   }
 
   if (opts.doLs) {
-    await listDirectory(targetDir, opts.recursive, opts.extFilter);
+    await listDirectory(targetDir, opts.recursive, opts.extFilter, opts.doLsFolder);
     rl.close();
     return;
   }

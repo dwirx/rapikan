@@ -30,6 +30,8 @@ rapikan [path] [flags...]
 | `--delete-where` | | `criteria` | — | **Baru v1.0.6** — Hapus file berdasarkan kriteria (ukuran/umur/ekstensi) |
 | `--rm` | | `paths...` | — | **Baru v1.0.7** — Hapus file atau folder apapun secara manual |
 | `--ls` | | — | `false` | **Baru v1.0.8** — Tampilkan visualisasi pohon file & folder beserta statistiknya |
+| `--folder` | `-folder` / `--ls-folder` | — | `false` | **Baru v1.1.2** — Tampilkan kalkulasi ukuran folder secara rekursif saat menggunakan `--ls` |
+
 
 
 
@@ -383,45 +385,53 @@ rapikan --rm ./sampah -y
 
 > **Audit Trail:** Riwayat penghapusan dicatat secara rinci di dalam berkas `.rapikan-delete-log.json` pada direktori kerja saat ini.
 
----
-
 ### `--ls`
 
-Menampilkan visualisasi pohon file & folder (seperti perintah `tree`), lengkap dengan ukuran berkas, waktu modifikasi terakhir, icon representatif, statistik total, serta grafik distribusi tipe berkas.
+Menampilkan visualisasi pohon file & folder (seperti perintah `tree`), lengkap dengan waktu modifikasi terakhir, icon representatif, statistik total, serta grafik distribusi tipe berkas.
+
+Secara default, kolom `Length` akan langsung menampilkan `<DIR>` untuk folder agar listing berjalan **instan dan super cepat** (tidak melambat akibat membaca kapasitas disk pada folder-folder besar seperti `node_modules` atau `.git`).
 
 Mendukung kombinasi dengan flag `--recursive` / `-r` dan `--ext` untuk membatasi tampilan.
 
 ```bash
-# List file/folder di folder saat ini (non-recursive)
+# List file/folder di folder saat ini secara instan
 rapikan --ls
 
 # List file/folder secara mendalam di folder target
 rapikan ./media --ls -r
-
-# List hanya berkas video dengan ekstensi tertentu
-rapikan ./DCIM --ls -r --ext mp4,mov
 ```
 
-**Contoh Output:**
+---
+
+### `--folder` / `-folder` / `--ls-folder`
+
+Digunakan bersama dengan flag `--ls` untuk mengaktifkan **kalkulasi ukuran folder secara rekursif**.
+
+Jika flag ini disertakan, `rapikan` akan memindai isi sub-direktori untuk menghitung total kapasitas penyimpanannya dan menampilkannya di kolom `Length` (bukan menampilkan `<DIR>`).
+
+```bash
+# Tampilkan list berkas beserta ukuran foldernya
+rapikan --ls --folder
+
+# Tampilkan secara rekursif beserta ukuran folder
+rapikan ./media --ls -r --folder
 ```
-📁 media/
-├── 📁 foto/
-│   ├── 🖼️ liburan.jpg (4.25 MB | 2026-06-22)
-│   └── 🖼️ sunset.png (1.80 MB | 2026-06-23)
-├── 📁 video/
-│   └── 🎬 DJI_0001.mp4 (1.20 GB | 2026-06-20)
-└── 📝 catatan.txt (420 B | 2026-06-25)
+
+**Contoh Output dengan `--folder`:**
+```
+Mode    LastWriteTime     Length      Name
+------  ---------------   --------    ----
+d----   2026-06-29 07:11  150.1 KB    📁 .git
+d----   2026-06-28 18:08  2.2 KB      📁 .github
+d----   2026-06-28 17:38  27.59 MB    📁 node_modules
+-a---   2026-06-29 07:11  741 B       📝 package.json
+-a---   2026-06-28 18:45  8.0 KB      📝 README.md
 
   📊 STATISTIK DIREKTORI:
-  • Total File       : 4 file
-  • Total Folder     : 2 folder
-  • Total Ukuran     : 1.21 GB
-
-  🧬 DISTRIBUSI TIPE BERKAS (berdasarkan ukuran):
-    🎬 .mp4      :   1 file │     1.20 GB
-    🖼️ .jpg      :   1 file │     4.25 MB
-    🖼️ .png      :   1 file │     1.80 MB
-    📝 .txt      :   1 file │      420 B
+  • Total File       : 2 file
+  • Total Folder     : 3 folder
+  • Total Ukuran     : 27.75 MB
 ```
+
 
 
