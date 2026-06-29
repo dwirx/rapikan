@@ -317,7 +317,7 @@ export async function listDirectory(
   console.log(bold(cyan("  📊 STATISTIK DIREKTORI:")));
   console.log(`  ${gray("•")} Total File       : ${bold(green(String(stats.totalFiles)))} file`);
   console.log(`  ${gray("•")} Total Folder     : ${bold(cyan(String(stats.totalDirs)))} folder`);
-  console.log(`  ${gray("•")} Total Ukuran     : ${bold(yellow(fmtBytes(stats.totalSize)))}`);
+  console.log(`  ${gray("•")} Total Ukuran     : ${bold(yellow(fmtBytes(tree.size)))}`);
 
   // Breakdown by extensions
   const extList = Object.entries(stats.exts).sort((a, b) => b[1].size - a[1].size);

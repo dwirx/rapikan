@@ -1,9 +1,7 @@
-## ✨ v1.1.0 — Kalkulasi & Tampilan Ukuran Folder pada `--ls`
+## ✨ v1.1.1 — Penyempurnaan Total Ukuran Folder dan Statistik `--ls`
 
-Rilis ini membawa penyempurnaan besar pada fitur `--ls` (list berkas) dengan menghitung ukuran folder secara dinamis.
+Rilis perbaikan dan peningkatan kualitas visual untuk fitur list berkas (`--ls`).
 
-### 📁 Fitur Baru: Kalkulasi Ukuran Folder Otomatis
-- **Tampilan Ukuran Folder**: Kolom `Length` kini tidak lagi menampilkan teks statis `<DIR>` untuk folder. Sebagai gantinya, `rapikan` akan **menghitung secara rekursif total ukuran seluruh isi folder** tersebut dan menampilkannya dengan satuan ukuran yang mudah dibaca (`B`, `KB`, `MB`, `GB`).
-- **Peningkatan Performa Pintar**:
-  - Untuk folder besar seperti `node_modules` atau `.git`, ukurannya tetap dihitung secara cepat pada sistem latar belakang, namun tidak akan diekspansi ke dalam pohon visual untuk menjaga kerapian terminal.
-  - Untuk folder kosong (seperti folder `aku`), ukuran secara akurat akan ditampilkan sebagai `0 B`.
+### 🔧 Perbaikan & Peningkatan:
+- **Kalkulasi Ukuran Folder Akurat**: Memperbaiki kalkulasi ukuran direktori pada listing flat (non-rekursif) sehingga ukuran sub-direktori sekarang dihitung sepenuhnya secara presisi dan dinamis di kolom `Length`.
+- **Akurasi Total Ukuran di Statistik Footer**: Mengubah penghitungan `Total Ukuran` pada statistik direktori di bagian paling bawah agar menampilkan ukuran total folder secara rekursif (`tree.size`), bukan hanya total dari berkas yang terdaftar langsung di root, memberikan representasi data yang akurat.
