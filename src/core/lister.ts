@@ -44,6 +44,28 @@ function formatDate(d: Date): string {
   return `${y}-${m}-${dd} ${hh}:${mm}`;
 }
 
+// ─────────────────────────────────────────────
+// Get total directory size recursively (fallback for non-recursion)
+// ─────────────────────────────────────────────
+async function getDirSize(dir: string): Promise<number> {
+  let size = 0;
+  try {
+    const entries = await readdir(dir, { withFileTypes: true });
+    for (const e of entries) {
+      const full = path.join(dir, e.name);
+      if (e.isDirectory()) {
+        size += await getDirSize(full);
+      } else if (e.isFile()) {
+        try {
+          const s = await stat(full);
+          size += s.size;
+        } catch {}
+      }
+    }
+  } catch {}
+  return size;
+}
+
 interface FileInfo {
   name: string;
   fullPath: string;
@@ -56,6 +78,7 @@ interface DirInfo {
   name: string;
   fullPath: string;
   date: string;
+  size: number;
   files: FileInfo[];
   subdirs: DirInfo[];
 }
@@ -85,6 +108,7 @@ async function buildTree(
     const entries = await readdir(dir, { withFileTypes: true });
     const files: FileInfo[] = [];
     const subdirs: DirInfo[] = [];
+    let dirSize = 0;
 
     // Get dir modification time
     let dirDateStr = "-";
@@ -105,21 +129,27 @@ async function buildTree(
           subDateStr = formatDate(s.mtime || s.birthtime);
         } catch {}
 
-        // List dir, but only recurse if specified and not a blacklisted high-file directory
+        let subdirSize = 0;
+        // List dir, but only recurse if specified and not a blacklisted directory
         if (recursive && !NO_RECURSE_DIRS.has(entry.name)) {
           const subTree = await buildTree(fullPath, recursive, extFilter, stats);
           if (subTree) {
             subdirs.push(subTree);
+            subdirSize = subTree.size;
           }
         } else {
+          // If we don't recurse, calculate directory size recursively on the fly
+          subdirSize = await getDirSize(fullPath);
           subdirs.push({
             name: entry.name,
             fullPath,
             date: subDateStr,
+            size: subdirSize,
             files: [],
             subdirs: []
           });
         }
+        dirSize += subdirSize;
       } else if (entry.isFile()) {
         const ext = path.extname(entry.name).toLowerCase();
         if (extFilter && !extFilter.has(ext)) continue;
@@ -140,6 +170,8 @@ async function buildTree(
           ext
         });
 
+        dirSize += size;
+
         // Update global stats
         stats.totalFiles++;
         stats.totalSize += size;
@@ -159,6 +191,7 @@ async function buildTree(
       name: path.basename(dir) || dir,
       fullPath: dir,
       date: dirDateStr,
+      size: dirSize,
       files,
       subdirs
     };
@@ -188,7 +221,7 @@ function collectRows(
     rows.push({
       mode: "d----",
       lastWriteTime: subdir.date,
-      length: "<DIR>",
+      length: fmtBytes(subdir.size),
       namePrefix: prefix + branch,
       nameIcon: "📁",
       nameText: subdir.name + (recursive ? "/" : ""),

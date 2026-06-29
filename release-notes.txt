@@ -1,12 +1,9 @@
-## ✨ v1.0.9 — Perubahan Tampilan `--ls` & Tampilkan Semua Berkas
+## ✨ v1.1.0 — Kalkulasi & Tampilan Ukuran Folder pada `--ls`
 
-Pembaruan format `--ls` (list berkas) dengan layout tabular menyerupai PowerShell/Terminal profesional yang jauh lebih informatif.
+Rilis ini membawa penyempurnaan besar pada fitur `--ls` (list berkas) dengan menghitung ukuran folder secara dinamis.
 
-### 📁 Pembaruan Fitur `--ls`:
-- **Tampilkan Semua Berkas**: Tidak ada lagi berkas/folder tersembunyi atau terabaikan. Berkas seperti `.env`, `.git`, `.github`, `node_modules`, `build.ts`, dll. kini muncul seutuhnya.
-- **Struktur Kolom Detail**: Menampilkan tabel dengan kolom yang teratur:
-  - `Mode`: `d----` untuk folder/direktori, `-a---` untuk berkas/archive.
-  - `LastWriteTime`: Waktu perubahan terakhir berkas (format `YYYY-MM-DD HH:MM`).
-  - `Length`: Kapasitas berkas terkonversi otomatis (`B`, `KB`, `MB`, `GB`) atau label `<DIR>` untuk direktori.
-  - `Name`: Struktur pohon visual (`├──` / `└──`) beserta icon & warna khusus terintegrasi langsung di dalam nama berkas.
-- **Antisipasi Hang (Limit Rekursif)**: Folder besar seperti `node_modules` dan `.git` tetap ditampilkan sebagai folder, namun proses pemindaian rekursif tidak akan masuk ke dalamnya secara default untuk mencegah hang/crash konsol karena ratusan ribu berkas.
+### 📁 Fitur Baru: Kalkulasi Ukuran Folder Otomatis
+- **Tampilan Ukuran Folder**: Kolom `Length` kini tidak lagi menampilkan teks statis `<DIR>` untuk folder. Sebagai gantinya, `rapikan` akan **menghitung secara rekursif total ukuran seluruh isi folder** tersebut dan menampilkannya dengan satuan ukuran yang mudah dibaca (`B`, `KB`, `MB`, `GB`).
+- **Peningkatan Performa Pintar**:
+  - Untuk folder besar seperti `node_modules` atau `.git`, ukurannya tetap dihitung secara cepat pada sistem latar belakang, namun tidak akan diekspansi ke dalam pohon visual untuk menjaga kerapian terminal.
+  - Untuk folder kosong (seperti folder `aku`), ukuran secara akurat akan ditampilkan sebagai `0 B`.
